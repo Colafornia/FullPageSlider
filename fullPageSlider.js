@@ -17,7 +17,7 @@
     this.option = {
       wrap: '.wrap',
       page: '.page',
-      speed: 400,
+      speed: 1400,
       delayTime: 50,
       onSwipeStart: function () {},
       callback: function () {},
@@ -43,29 +43,31 @@
   }
   fullPageSlider.prototype = {
     _init: function () {
+      this.pages[0].style.height = this.scrollDist + 'px'
+      this._toPage(0)
       for (var i = 1; i < this.length; i++) {
-        this._outPage(i, 0)
+        this._outPage(i, 0, 100)
         this.pages[i].style.height = this.scrollDist + 'px'
       }
-      this._toPage(0)
-      this.pages[0].style.height = this.scrollDist + 'px'
     },
     _toPage: function (index) {
       this.pages[index].style.cssText += '-webkit-transition-duration:' + this.option.speed + 'ms;-webkit-transform:translate3d(0, 0, 0)'
     },
-    _outPage: function (index, current) {
+    _outPage: function (index, current, speed) {
       var offset = index - current
-      this.pages[index].style.cssText += '-webkit-transition-duration:' + this.option.speed +'ms;-webkit-transform:translate3d(0,'+ this.scrollDist*offset + 'px,0)'
+      var pageSpeed = speed ? speed : this.option.speed
+      this.pages[index].style.cssText += '-webkit-transition-duration:' + pageSpeed +'ms;-webkit-transform:translate3d(0,'+ this.scrollDist*offset + 'px,0)'
     },
     _transition: function (leaveIndex, toIndex) {
       this.currentIndex = toIndex
-      this._outPage(leaveIndex, this.currentIndex)
       this._toPage(toIndex)
+      this._outPage(leaveIndex, this.currentIndex)
     },
     next: function () {
       var index = this.currentIndex + 1
       if (index > this.length - 1) {
-        index = 0
+        this.currentIndex = 0
+        return this._init()
       }
       this.to(index)
     },
